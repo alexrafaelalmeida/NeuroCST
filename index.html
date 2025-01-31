@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Galería Digital</title>
+  <style>
+    body {
+      background: #000;
+      color: #fff;
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+    section {
+      width: 100vw;
+      height: 100vh;
+      position: relative;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    canvas {
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+  </style>
+</head>
+<body>
+   <section id="neurocst"></section>
+    <section id="cerebro"></section> 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
+  <script>
+    // Sketch para "Neurocst"
+    new p5((sketch) => {
+      sketch.setup = function() {
+        let c = sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
+        c.parent("neurocst");
+        sketch.background(0);
+      };
+      sketch.draw = function() {
+        sketch.fill(sketch.frameCount % 255, 100, 200);
+        sketch.textSize(80);
+        sketch.textAlign(sketch.CENTER, sketch.CENTER);
+        sketch.text("NeuroCST", sketch.width / 2, sketch.height / 2);
+      };
+    });
+     </script>
+
+     <!-- Sketch Cerebro -->
+<script>
+  new p5((sketch) => {
+    let angle = 0;
+    let hue = 0;
+    let brightness = 0;
+    let particles = [];
+    let detail = 0;
+  
+    sketch.setup = function() {
+      let c = sketch.createCanvas(sketch.windowWidth, sketch.windowHeight);
+      c.parent("cerebro");
+      sketch.colorMode(sketch.HSB, 360, 100, 100, 255);
+      // Crear partículas
+      for (let i = 0; i < 200; i++) {
+        particles.push({
+          x: sketch.random(sketch.width),
+          y: sketch.random(sketch.height),
+          vx: sketch.random(-1, 1),
+          vy: sketch.random(-1, 1)
+        });
+      }
+    };
+  
+    sketch.draw = function() {
+      sketch.background(0, 0.05); 
+      angle += 0.01;
+      hue = (hue + 0.5) % 360;
+      brightness = sketch.min(brightness + 0.2, 100);
+      detail = sketch.lerp(detail, 1, 0.01);
+  
+      // Partículas con movimiento basado en ruido
+      sketch.noStroke();
+      for (let p of particles) {
+        p.x += p.vx * sketch.noise(p.y * 0.01, sketch.frameCount * 0.01);
+        p.y += p.vy * sketch.noise(p.x * 0.01, sketch.frameCount * 0.01);
+        if (p.x < 0) p.x = sketch.width;
+        if (p.x > sketch.width) p.x = 0;
+        if (p.y < 0) p.y = sketch.height;
+        if (p.y > sketch.height) p.y = 0;
+        sketch.fill((hue + p.x) % 360, 80, 80, 170);
+        sketch.circle(p.x, p.y, 3);
+      }
+  
+      // Transformaciones del cerebro
+      sketch.push();
+      sketch.translate(sketch.width / 2 + sketch.sin(angle) * 50, sketch.height / 2);
+      sketch.rotate(sketch.sin(angle * 0.5) * 0.1);
+      sketch.scale(1 + 0.05 * sketch.sin(angle));
+  
+      // Cerebro realista
+      sketch.fill(hue, 80, brightness, 200);
+      sketch.beginShape();
+      sketch.vertex(-80, 0);
+      sketch.bezierVertex(-100, -60, -50, -100, 0, -80);
+      sketch.bezierVertex(50, -100, 100, -60, 80, 0);
+      sketch.bezierVertex(100, 60, 50, 100, 0, 80);
+      sketch.bezierVertex(-50, 100, -100, 60, -80, 0);
+      sketch.endShape(sketch.CLOSE);
+  
+      // Texturas adicionales
+      sketch.fill((hue + 180) % 360, 60, brightness, 70 + 80 * detail);
+      let size = 40 + 10 * sketch.sin(angle * 2);
+      sketch.circle(0, 0, size);
+  
+      sketch.pop();
+    };
+  });
+  </script>
+ </body>
+</html>
